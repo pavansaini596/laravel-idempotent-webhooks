@@ -13,16 +13,16 @@ A tiny, opinionated Laravel package that makes any route idempotent based on a h
 
 ## Why?
 
-At [Flebo.in](https://pavansaini.com/case-study/flebo.html) (a multi-lab pathology aggregator on SpiceJet) we kept seeing the same pattern:
+While working on a transaction-heavy healthcare aggregator, I kept seeing the same pattern:
 
 - Payment gateway webhook fires.
 - Our controller is a few ms too slow to ACK.
 - Gateway retries. Then retries again.
-- We process the payment three times. Wallet is now off by ₹1,498.
+- We process the payment three times. The wallet is now off by ₹1,498.
 
-The fix isn't "be faster". The fix is: **remember what you already did and refuse to do it again**.
+The fix isn't &ldquo;be faster&rdquo;. The fix is: **remember what you already did and refuse to do it again**.
 
-This package is a cleaned-up extract of that pattern, designed to be dropped into any Laravel app in under five minutes.
+This package is a cleaned-up extract of that pattern, designed to drop into any Laravel app in under five minutes.
 
 ---
 
@@ -53,7 +53,7 @@ The first request through runs the controller and stores the response. Any retry
 ### Option 2 — Facade / helper (explicit)
 
 ```php
-use PavanSaini\IdempotentWebhooks\Idempotency;
+use PavanSaini\IdempotentWebhooks\Facades\Idempotency;
 
 public function handle(Request $request)
 {
@@ -93,9 +93,9 @@ The unique index does the heavy lifting — no distributed locks, no races, work
 └────────┬────────┘
          │
          ▼
-┌──────────────────────┐     exists?      ┌──────────────────┐
+┌──────────────────────┐     exists?     ┌──────────────────┐
 │  idempotent middleware│ ───────────────▶│  return cached   │
-│  INSERT IGNORE row   │                  │  response        │
+│  INSERT IGNORE row    │                 │  response        │
 └────────┬─────────────┘                  └──────────────────┘
          │ inserted (first time)
          ▼
@@ -162,7 +162,7 @@ Unique index on `(namespace, key)`. That's the whole trick.
 composer test
 ```
 
-Ships with a test suite that runs actual HTTP requests, concurrent inserts (simulated), and both drivers. Coverage sits around 95%.
+Ships with a test suite covering: basic caching, key isolation, and claim-release on failure so retries can actually retry.
 
 ---
 
@@ -185,9 +185,9 @@ Ships with a test suite that runs actual HTTP requests, concurrent inserts (simu
 
 ## Credits
 
-Built by [Pavan Saini](https://pavansaini.com/) — Senior Backend Engineer. Extracted from production work at [Flebo.in](https://pavansaini.com/case-study/flebo.html) and SpiceHealth.
+Built by [Pavan Saini](https://pavansaini.com/) — Senior Backend Engineer.
 
-If this saves you a 2am Slack ping, consider [hiring me](mailto:info@pavansaini.com).
+Extracted from production work on transaction-heavy aggregator &amp; payment-reconciliation systems. If this saves you a 2am Slack ping, consider [hiring me](mailto:pavansaini596@gmail.com).
 
 ---
 
